@@ -65,10 +65,13 @@ show_progress() {
     local name=$2
     local total=${TOTAL_STEPS}
     local elapsed_total=$(($(date +%s) - START_TIME))
-    local est_time=${STEP_TIME[$step]}
     local remaining=0
-    for ((i=step; i<=TOTAL_STEPS; i++)); do
-        remaining=$((remaining + ${STEP_TIME[$i]}))
+    local i
+    # 仅累加“当前及后续已定义”步骤的预估时间，避免引用未定义下标触发 set -u
+    for i in "${!STEP_TIME[@]}"; do
+        if (( i >= step )); then
+            remaining=$((remaining + STEP_TIME[$i]))
+        fi
     done
     remaining=$((remaining - elapsed_total))
     [ $remaining -lt 0 ] && remaining=0
@@ -106,12 +109,18 @@ check_prerequisites() {
     # 注：Docker 不作为硬性前置检测——Linux 下由 install_docker 自动安装，
     # macOS 下需用户自行安装 Docker Desktop（install_docker 中会给出引导）。
 
-    if [[ "$OS" == "linux" ]]; then
-        MEM_TOTAL=$(free -g | awk '/^Mem:/{print $2}')
-        if [[ $MEM_TOTAL -lt 16 ]]; then
-            log_warn "内存 ${MEM_TOTAL}GB，建议至少 16GB"
+    if [[ "$OS" == "linux" && -r /proc/meminfo ]]; then
+        # 直接读 /proc/meminfo：字段为固定英文，不受 free 中文本地化输出影响
+        MEM_KB=$(awk '/^MemTotal:/{print $2}' /proc/meminfo 2>/dev/null || true)
+        if [[ -n "${MEM_KB:-}" ]]; then
+            MEM_TOTAL=$((MEM_KB / 1048576))   # kB → GiB（向下取整）
+            if (( MEM_TOTAL < 16 )); then
+                log_warn "内存 ${MEM_TOTAL}GB，建议至少 16GB"
+            else
+                log_info "内存: ${MEM_TOTAL}GB ✓"
+            fi
         else
-            log_info "内存: ${MEM_TOTAL}GB ✓"
+            log_warn "无法读取内存信息，跳过内存检测"
         fi
     fi
 
