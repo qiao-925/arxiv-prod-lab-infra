@@ -4,6 +4,7 @@
 # ============================================================
 #  技术栈清单（按数据流向）：
 #
+#  0. Docker                  - 容器运行时，为集群与应用提供运行底座
 #  1. K3s                    - 轻量级 Kubernetes 发行版，容器编排底座
 #  2. Helm                   - Kubernetes 包管理器，用于部署复杂应用
 #  3. Argo CD                - GitOps 持续部署，声明式同步集群状态
@@ -17,7 +18,7 @@
 # ============================================================
 #  硬件要求：16GB+ 内存，100GB+ 磁盘
 #  推荐配置：32GB 内存，2TB 硬盘
-#  预计总耗时：15-25 分钟（取决于网络速度）
+#  预计总耗时：16-27 分钟（取决于网络速度）
 # ============================================================
 
 set -euo pipefail
@@ -41,11 +42,12 @@ log_ok()    { echo -e "${CYAN}[OK]${NC} $1"; }
 # ============================================================
 # 进度管理
 # ============================================================
-TOTAL_STEPS=10
+TOTAL_STEPS=11
 CURRENT_STEP=0
 
 # 步骤预估时间（秒）
 declare -A STEP_TIME=(
+    [0]="120"  # Docker
     [1]="60"   # K3s
     [2]="30"   # Helm
     [3]="120"  # Argo CD
@@ -101,9 +103,8 @@ check_prerequisites() {
         fi
     done
 
-    if ! command -v docker &> /dev/null; then
-        log_error "未检测到 Docker，请先安装 Docker"
-    fi
+    # 注：Docker 不作为硬性前置检测——Linux 下由 install_docker 自动安装，
+    # macOS 下需用户自行安装 Docker Desktop（install_docker 中会给出引导）。
 
     if [[ "$OS" == "linux" ]]; then
         MEM_TOTAL=$(free -g | awk '/^Mem:/{print $2}')
@@ -115,6 +116,56 @@ check_prerequisites() {
     fi
 
     log_ok "环境检测通过"
+}
+
+# ============================================================
+# 0. 安装 Docker (预估: 120秒)
+# ============================================================
+install_docker() {
+    CURRENT_STEP=0
+    show_progress $CURRENT_STEP "Docker - 容器运行环境"
+
+    if command -v docker &> /dev/null; then
+        log_warn "Docker 已安装，跳过"
+        return
+    fi
+
+    case "$OS" in
+        linux)
+            log_info "正在使用 Docker 官方脚本安装..."
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            rm -f get-docker.sh
+            sudo usermod -aG docker "$USER"
+            ;;
+        darwin)
+            log_warn "macOS 系统：脚本无法自动安装 Docker，请手动安装 Docker Desktop"
+            echo ""
+            echo "  推荐使用 Homebrew 安装："
+            echo "    brew install --cask docker"
+            echo ""
+            echo "  安装完成后启动 Docker Desktop，再重新执行本脚本。"
+            exit 1
+            ;;
+        *)
+            log_error "不支持的平台: ${OS}"
+            ;;
+    esac
+
+    # 等待 Docker 守护进程就绪（systemd 环境；K3s 自带 containerd，不强依赖 docker 守护进程）
+    if command -v systemctl &> /dev/null; then
+        sudo systemctl enable docker >/dev/null 2>&1 || true
+        sudo systemctl start docker || true
+        for _ in $(seq 1 15); do
+            if sudo systemctl is-active --quiet docker 2>/dev/null; then
+                break
+            fi
+            sleep 1
+        done
+    fi
+
+    log_ok "Docker 安装完成 (版本: $(docker --version))"
+    log_info "提示: 重新登录终端后，当前用户可直接执行 docker 而无需 sudo"
 }
 
 # ============================================================
@@ -564,6 +615,7 @@ main() {
 
     check_prerequisites
 
+    install_docker
     install_k3s
     install_helm
     install_argocd

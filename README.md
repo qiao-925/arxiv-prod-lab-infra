@@ -4,7 +4,7 @@ arXiv Prod Lab — 生产级大数据平台一键部署基础设施。
 
 ## ✨ 一键安装
 
-通过 curl 从 GitHub 拉取并直接执行部署脚本，无需手动下载：
+通过 curl 从 GitHub 拉取并直接执行部署脚本，无需手动下载。脚本会自动检测并安装 Docker（若已安装则跳过），从一台干净的 Linux 主机即可开始：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/qiao-925/arxiv-prod-lab-infra/main/env-builder.sh | bash
@@ -27,6 +27,7 @@ chmod +x env-builder.sh
 
 | # | 组件 | 用途 |
 |---|------|------|
+| 0 | Docker | 容器运行时（自动安装） |
 | 1 | K3s | 轻量级 Kubernetes 容器编排底座 |
 | 2 | Helm | Kubernetes 包管理器 |
 | 3 | Argo CD | GitOps 持续部署 |
@@ -42,7 +43,7 @@ chmod +x env-builder.sh
 
 - 最低：16GB+ 内存，100GB+ 磁盘
 - 推荐：32GB 内存，2TB 硬盘
-- 预计耗时：15-25 分钟（取决于网络速度）
+- 预计耗时：16-27 分钟（取决于网络速度，含 Docker 安装）
 
 ## 🔧 本地开发
 
