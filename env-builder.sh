@@ -141,11 +141,25 @@ install_docker() {
 
     case "$OS" in
         linux)
-            log_info "正在使用 Docker 官方脚本安装..."
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-            rm -f get-docker.sh
-            sudo usermod -aG docker "$USER"
+            # 按包管理器分派安装方式。
+            # get.docker.com 官方脚本仅支持 deb/rpm 系，不支持 Arch 系（CachyOS/Arch/Manjaro 等）。
+            if command -v pacman &> /dev/null; then
+                log_info "检测到 Arch 系发行版 (pacman)，改用系统源安装 Docker..."
+                sudo pacman -S --noconfirm --needed docker docker-compose docker-buildx \
+                    || log_error "pacman 安装失败：若提示 target not found，请先执行 sudo pacman -Syu 刷新软件源后重试"
+            elif command -v apt-get &> /dev/null || command -v dnf &> /dev/null || command -v yum &> /dev/null; then
+                log_info "正在使用 Docker 官方脚本安装..."
+                curl -fsSL https://get.docker.com -o get-docker.sh
+                sudo sh get-docker.sh
+                rm -f get-docker.sh
+            else
+                log_error "无法识别的包管理器，请先手动安装 Docker 后重试"
+            fi
+            # 将当前用户加入 docker 组（失败不影响本次部署，K3s 自带 containerd）
+            if command -v usermod &> /dev/null; then
+                sudo usermod -aG docker "$USER" 2>/dev/null \
+                    || log_warn "无法将 ${USER} 加入 docker 组，请用 sudo docker 代替"
+            fi
             ;;
         darwin)
             log_warn "macOS 系统：脚本无法自动安装 Docker，请手动安装 Docker Desktop"
@@ -161,12 +175,14 @@ install_docker() {
             ;;
     esac
 
-    # 等待 Docker 守护进程就绪（systemd 环境；K3s 自带 containerd，不强依赖 docker 守护进程）
+    # 启动 Docker 守护进程并等待就绪（systemd 环境；K3s 自带 containerd，不强依赖 docker 守护进程）
+    local docker_active=false
     if command -v systemctl &> /dev/null; then
         sudo systemctl enable docker >/dev/null 2>&1 || true
-        sudo systemctl start docker || true
-        for _ in $(seq 1 15); do
+        sudo systemctl start docker 2>/dev/null || true
+        for _ in $(seq 1 20); do
             if sudo systemctl is-active --quiet docker 2>/dev/null; then
+                docker_active=true
                 break
             fi
             sleep 1
@@ -175,6 +191,9 @@ install_docker() {
 
     log_ok "Docker 安装完成 (版本: $(docker --version))"
     log_info "提示: 重新登录终端后，当前用户可直接执行 docker 而无需 sudo"
+    if [[ "$docker_active" != "true" ]] && command -v systemctl &> /dev/null; then
+        log_warn "Docker 守护进程暂未就绪（K3s 自带 containerd，本次部署仍可继续；可用 systemctl status docker 排查）"
+    fi
 }
 
 # ============================================================
