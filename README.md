@@ -4,35 +4,24 @@ arXiv Prod Lab — 生产级大数据平台一键部署基础设施。
 
 ## ✨ 一键安装
 
-> ⚠️ 本仓库当前为 **private**，匿名 `curl raw.githubusercontent.com` 会返回 404。
-> 请使用下面的 `gh`（GitHub CLI）命令——它复用你本机已登录的 GitHub 凭据，无需任何手动下载：
+通过 curl 从 GitHub 拉取并直接执行部署脚本，无需手动下载：
 
 ```bash
-gh api -H "Accept: application/vnd.github.raw" \
-  repos/qiao-925/arxiv-prod-lab-infra/contents/env-builder.sh?ref=main | bash
+curl -fsSL https://raw.githubusercontent.com/qiao-925/arxiv-prod-lab-infra/main/env-builder.sh | bash
 ```
 
-首次使用需先登录并授予仓库读取权限：
+> 国内网络较慢时，可使用镜像加速：
+> ```bash
+> curl -fsSL https://ghproxy.net/https://raw.githubusercontent.com/qiao-925/arxiv-prod-lab-infra/main/env-builder.sh | bash
+> ```
+
+或先下载到本地再执行（便于审计脚本内容）：
 
 ```bash
-gh auth login            # 按提示登录
-gh auth setup-git        # （可选）让 git clone 也复用 gh 凭据
-```
-
-或者先下载到本地再执行（便于审计脚本内容）：
-
-```bash
-gh api -H "Accept: application/vnd.github.raw" \
-  -o env-builder.sh \
-  repos/qiao-925/arxiv-prod-lab-infra/contents/env-builder.sh?ref=main
+curl -fsSL -o env-builder.sh https://raw.githubusercontent.com/qiao-925/arxiv-prod-lab-infra/main/env-builder.sh
 chmod +x env-builder.sh
 ./env-builder.sh
 ```
-
-> 若仓库未来改为 public，可还原为真正的匿名一键 curl：
-> ```bash
-> curl -fsSL https://raw.githubusercontent.com/qiao-925/arxiv-prod-lab-infra/main/env-builder.sh | bash
-> ```
 
 ## 📦 技术栈
 
@@ -61,7 +50,7 @@ chmod +x env-builder.sh
 # 修改脚本后做语法检查
 bash -n env-builder.sh
 
-# 提交并推送
+# 提交并推送，远端更新后 curl 命令立即生效
 git add env-builder.sh
 git commit -m "Update env-builder deploy script"
 git push origin main
