@@ -1,0 +1,65 @@
+# ============================================================
+#  Kafka 集群 —— 实时消息管道
+# ============================================================
+#  Strimzi 1.x 已是 KRaft-only（ZooKeeper 已移除），结构为：
+#    KafkaNodePool (承载 replicas/storage) + Kafka (承载 listeners/config)
+#
+#  注意：KafkaNodePool 必须带标签 strimzi.io/cluster: <Kafka CR 名>，
+#        这是它与 Kafka CR 的绑定关系。
+# ============================================================
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: arxiv-cluster
+spec:
+  replicas: 3
+  # 同一组节点同时承担 controller + broker 角色（KRaft 特有）
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: ephemeral
+        kraftMetadata: shared
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2"
+---
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: arxiv-cluster
+  namespace: kafka
+spec:
+  kafka:
+    version: 4.3.1
+    metadataVersion: 4.3-IV0
+    listeners:
+      # 集群内访问
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      # 集群外访问（NodePort）
+      - name: external
+        port: 29092
+        type: nodeport
+        tls: false
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      default.replication.factor: 3
+      min.insync.replicas: 2
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

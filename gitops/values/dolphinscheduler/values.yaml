@@ -1,0 +1,22 @@
+# ============================================================
+#  DolphinScheduler 参数（chart 来自源码树 deploy/kubernetes/dolphinscheduler）
+# ============================================================
+#  保持 chart 默认的自包含模式：内置 PostgreSQL + ZooKeeper，
+#  开箱即用。若改用外部数据库，再覆盖 datasource 与 postgresql.enabled。
+image:
+  registry: apache
+  tag: 3.2.0
+
+# 实验环境各角色单副本
+master:
+  replicas: 1
+worker:
+  replicas: 1
+alert:
+  replicas: 1
+
+# API/UI 用 NodePort 暴露
+api:
+  service:
+    type: NodePort
+    nodePort: 30500

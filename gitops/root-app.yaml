@@ -1,0 +1,36 @@
+# ============================================================
+#  Root Application —— app-of-apps 唯一入口
+# ============================================================
+#  这是整个 GitOps 体系的"播种"点：手工 apply 这一个文件后，
+#  Argo CD 会扫描 gitops/apps/ 下的所有 Application，
+#  由它们各自去拉取 Helm chart / 清单并部署。
+#
+#  用法（阶段一只需执行一次）：
+#    kubectl apply -f gitops/root-app.yaml
+#
+#  之后所有变更都走 Git：改 YAML → git push → 自动同步
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+    targetRevision: main
+    path: gitops/apps
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false

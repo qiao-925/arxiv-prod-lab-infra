@@ -1,0 +1,28 @@
+# ============================================================
+#  MinIO Tenant —— 静态 YAML 类型
+# ============================================================
+#  与 minio-operator（Helm 型）配对：
+#    wave 0 装 Operator + CRD  →  wave 1 装 Tenant 实例
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio-tenant
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+    targetRevision: main
+    path: gitops/manifests/minio-tenant
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

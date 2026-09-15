@@ -1,0 +1,48 @@
+# ============================================================
+#  MinIO Tenant —— S3 兼容对象存储（数据湖底座）
+# ============================================================
+#  Operator 由 Helm 装（wave 0），Tenant 是业务配置（wave 1）。
+#  依赖 tenants.minio.min.io CRD —— 该 CRD 由 minio-operator chart 提供。
+#
+#  ⚠️ 资源提示：servers × volumesPerServer = PVC 数量。
+#     单机实验环境建议 servers: 1；生产可调大。
+# ============================================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-creds
+  namespace: minio
+type: Opaque
+stringData:
+  accesskey: "minioadmin"
+  secretkey: "minioadmin123"
+---
+apiVersion: minio.min.io/v2
+kind: Tenant
+metadata:
+  name: arxiv-tenant
+  namespace: minio
+spec:
+  pools:
+    - name: pool-0
+      # 4 server × 1 volume = 4 块盘，满足 MinIO 纠删码最小要求
+      servers: 4
+      volumesPerServer: 1
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+  credentialsSecret:
+    name: minio-creds
+  # 控制台与 S3 API 用 NodePort 暴露
+  exposeServices:
+    console:
+      type: NodePort
+      nodePort: 30901
+    minio:
+      type: NodePort
+      nodePort: 30900
+  # 关掉自动 TLS，实验环境用 HTTP，省去证书麻烦
+  requestAutoCert: false

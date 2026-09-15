@@ -1,0 +1,13 @@
+# ============================================================
+#  MinIO Operator 参数（对应 chart: minio-operator/operator 7.1.1）
+# ============================================================
+#  实验环境单节点，副本数从默认 2 降到 1，省内存
+operator:
+  replicaCount: 1
+  env:
+    # 允许 Operator 管理 StatefulSet 形式的 Tenant
+    - name: OPERATOR_STS_ENABLED
+      value: "on"
+  # 国内拉取走 containerd 已配置的 docker.io/quay.io 加速
+  image:
+    pullPolicy: IfNotPresent

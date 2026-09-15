@@ -1,0 +1,27 @@
+# ============================================================
+#  Kafka 集群实例 —— 静态 YAML 类型
+# ============================================================
+#  wave 1：必须在 kafka-operator（wave 0）装好 CRD 之后。
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka-cluster
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+    targetRevision: main
+    path: gitops/manifests/kafka-cluster
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

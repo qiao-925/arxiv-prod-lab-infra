@@ -1,0 +1,36 @@
+# ============================================================
+#  cert-manager —— Flink Operator 的 webhook 依赖
+# ============================================================
+#  注意：这是被依赖项，不是业务组件。Flink Operator 的
+#  admission webhook 需要证书，没有 cert-manager 会一直起不来。
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://charts.jetstack.io
+      chart: cert-manager
+      targetRevision: v1.21.2
+      helm:
+        releaseName: cert-manager
+        valueFiles:
+          - $values/gitops/values/cert-manager/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

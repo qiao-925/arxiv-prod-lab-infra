@@ -1,0 +1,10 @@
+# ============================================================
+#  Strimzi Kafka Operator 参数（chart: strimzi/strimzi-kafka-operator 1.2.0）
+# ============================================================
+# 关键：默认 watchNamespaces 为空 = 只看自己所在的命名空间。
+# 这里显式声明只监听 kafka 命名空间，与 Kafka CR 所在位置一致。
+watchNamespaces:
+  - kafka
+
+# 实验环境单副本
+replicas: 1

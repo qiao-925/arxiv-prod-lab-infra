@@ -1,0 +1,36 @@
+# ============================================================
+#  Apache Superset —— BI 可视化
+# ============================================================
+#  注意：chart 仓库地址是 apache.github.io/superset
+#  （旧地址 apache-superset.github.io/helm-chart 已失效）
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: superset
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://apache.github.io/superset
+      chart: superset
+      targetRevision: 0.22.8
+      helm:
+        releaseName: superset
+        valueFiles:
+          - $values/gitops/values/superset/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: superset
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

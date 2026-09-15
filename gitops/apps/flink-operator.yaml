@@ -1,0 +1,39 @@
+# ============================================================
+#  Flink Kubernetes Operator —— 实时流计算（控制面）
+# ============================================================
+#  依赖：cert-manager（wave 0）必须先就绪，否则 webhook 起不来。
+#  故本 App 放在 wave 1。
+#
+#  chart 来源：Apache 官方下载站（无 github.io chart 仓库）
+#  可用版本见 https://downloads.apache.org/flink/
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://downloads.apache.org/flink/flink-kubernetes-operator-1.16.0/
+      chart: flink-kubernetes-operator
+      targetRevision: 1.16.0
+      helm:
+        releaseName: flink-kubernetes-operator
+        valueFiles:
+          - $values/gitops/values/flink-operator/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flink
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,37 @@
+# ============================================================
+#  Strimzi Kafka Operator —— 实时消息管道（控制面）
+# ============================================================
+#  Operator 本体。它负责把 Kafka CR 变成真正的 Kafka 集群。
+#  真正的 Kafka 集群在 gitops/manifests/kafka-cluster/（wave 1）
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://strimzi.io/charts/
+      chart: strimzi-kafka-operator
+      targetRevision: 1.2.0
+      helm:
+        releaseName: strimzi-kafka-operator
+        valueFiles:
+          - $values/gitops/values/kafka-operator/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # Strimzi 的 Kafka CRD 极大，必须服务端 apply
+      - ServerSideApply=true

@@ -1,0 +1,28 @@
+# ============================================================
+#  PostgreSQL —— 静态 YAML 类型示例
+# ============================================================
+#  与 Helm 型对比：这里 source 只有一个（我们自己的仓库），
+#  没有 chart、没有 config 里的值文件，直接 apply manifests/ 下的 YAML。
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+    targetRevision: main
+    path: gitops/manifests/postgres
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: database
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
