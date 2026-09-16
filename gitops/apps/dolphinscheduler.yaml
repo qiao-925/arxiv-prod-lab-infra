@@ -2,8 +2,10 @@
 #  DolphinScheduler —— 任务编排
 # ============================================================
 #  写法：单 source（git 路径 chart）+ helm.values 内联参数。
-#  特殊：官方已无公开 chart 仓库，chart 本体在源码树
-#  deploy/kubernetes/dolphinscheduler 下，直接用 git 路径作为 chart 源。
+#  特殊：官方 chart 的 bitnami 依赖指向 archive-full-index（45MB 索引），
+#  Argo CD 每次 helm dependency build 都会超时。故把 chart 连同 4 个
+#  依赖 tarball 一起 vendoring 进本仓库（gitops/charts/dolphinscheduler/），
+#  helm template 直接命中本地 charts/ 目录，不再联网拉依赖。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -15,9 +17,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/apache/dolphinscheduler.git
-    targetRevision: 3.2.2
-    path: deploy/kubernetes/dolphinscheduler
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+    targetRevision: main
+    path: gitops/charts/dolphinscheduler
     helm:
       releaseName: dolphinscheduler
       values: |

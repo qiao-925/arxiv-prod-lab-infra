@@ -20,10 +20,12 @@ gitops/
 │   ├── monitoring.yaml          # wave 2
 │   ├── dolphinscheduler.yaml    # wave 2
 │   └── superset.yaml            # wave 2
-└── manifests/             # 无官方 chart 的组件，放静态清单
-    ├── minio-tenant/
-    ├── kafka-cluster/
-    └── postgres/
+├── manifests/             # 无官方 chart 的组件，放静态清单
+│   ├── minio-tenant/
+│   ├── kafka-cluster/
+│   └── postgres/
+└── charts/                # 官方 chart 依赖无法联网解析时，vendoring 进来
+    └── dolphinscheduler/  # chart + 4 个 bitnami 依赖 tarball（自包含）
 ```
 
 > 原则：**一个组件一个文件**。Helm 型组件的参数直接写在 `apps/*.yaml` 的
@@ -42,7 +44,7 @@ gitops/
 | Kafka 集群 (KRaft) | 静态 YAML | 本仓库 | — | 1 |
 | PostgreSQL | 静态 YAML | 本仓库 | — | 1 |
 | 监控 (kube-prometheus-stack) | Helm 内联 | prometheus-community | 91.4.0 | 2 |
-| DolphinScheduler | Helm 内联 (git 路径) | apache/dolphinscheduler | 3.2.2 | 2 |
+| DolphinScheduler | Helm 内联 (vendored chart) | 本仓库 gitops/charts/dolphinscheduler | 3.2.2 | 2 |
 | Superset | Helm 内联 | apache.github.io/superset | 0.22.8 | 2 |
 
 ### 依赖关系
