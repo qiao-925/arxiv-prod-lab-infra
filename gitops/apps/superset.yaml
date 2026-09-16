@@ -30,6 +30,18 @@ spec:
         # Superset 6.1 拒绝用默认 SECRET_KEY 启动（安全加固），必须自定义
         config:
           SECRET_KEY: "z9nKZiQud5Bttfdm2BHXgzLRE8Geoo6fm0QPOYKWKroiEfetY5TghQ9z"
+
+        # apache/superset:6.1.0 镜像未内置 psycopg2 驱动，连接 PostgreSQL 元数据库必需。
+        # 借 chart 的 bootstrapScript 钩子，在容器启动前 pip 安装（走清华 PyPI 镜像）。
+        bootstrapScript: |
+          #!/bin/bash
+          /app/.venv/bin/python -m pip install --no-cache-dir psycopg2-binary -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+        # Argo CD 不执行 Helm hook（helm.sh/hook），会跳过 init-db Job，
+        # 导致元数据库未建表 / admin 未创建。清空 jobAnnotations 去掉 hook 标注，
+        # 让 init-db 变成普通 Job，由 Argo CD 正常创建执行。
+        init:
+          jobAnnotations: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: superset
