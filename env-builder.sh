@@ -80,9 +80,8 @@ test_mirror_sources() {
     local item name url code
     # 格式: "显示名|URL"
     local sources=(
-        "docker.io 加速 · 1Panel|https://docker.1ms.run/v2/"
-        "docker.io 加速 · 轩原|https://docker.xuanyuan.me/v2/"
         "docker.io 加速 · DaoCloud|https://docker.m.daocloud.io/v2/"
+        "docker.io 加速 · 1Panel|https://docker.1ms.run/v2/"
         "registry.k8s.io 镜像 · 阿里云|https://registry.aliyuncs.com/v2/"
         "quay.io 直连|https://quay.io/v2/"
         "ghcr.io 直连|https://ghcr.io/v2/"
@@ -169,9 +168,8 @@ configure_containerd_mirror() {
 mirrors:
   docker.io:
     endpoint:
-      - "https://docker.1ms.run"
-      - "https://docker.xuanyuan.me"
       - "https://docker.m.daocloud.io"
+      - "https://docker.1ms.run"
   registry.k8s.io:
     endpoint:
       - "https://registry.aliyuncs.com/google_containers"

@@ -1,10 +1,9 @@
 # ============================================================
 #  Superset 参数（chart: superset/superset 0.22.8 / app 6.1.0）
 # ============================================================
-#  保持极简：这个 chart 的默认值已经很完整
-#  （自带 PostgreSQL 与 Redis，开箱即用）。
-#
-#  ⚠️ 待办：登录后请立即改掉默认 admin 密码。
-#     如需自定义 SECRET_KEY / admin 密码 / NodePort，
-#     请先 `helm show values superset/superset --version 0.22.8`
-#     确认键名后再加到这里 —— 写错键名不会报错，只会静默失效。
+#  关键修复：chart 默认从 Scarf 遥测代理域名拉主镜像
+#  （apachesuperset.docker.scarf.sh），该域名不通 → ImagePullBackOff。
+#  改回 docker.io 短名，走阶段一配好的 docker.io 加速器。
+image:
+  repository: apache/superset
+  tag: "6.1.0"
