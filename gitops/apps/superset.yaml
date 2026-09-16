@@ -26,6 +26,10 @@ spec:
         image:
           repository: apache/superset
           tag: "6.1.0"
+
+        # Superset 6.1 拒绝用默认 SECRET_KEY 启动（安全加固），必须自定义
+        config:
+          SECRET_KEY: "z9nKZiQud5Bttfdm2BHXgzLRE8Geoo6fm0QPOYKWKroiEfetY5TghQ9z"
   destination:
     server: https://kubernetes.default.svc
     namespace: superset
