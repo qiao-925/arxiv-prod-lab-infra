@@ -25,6 +25,24 @@ spec:
           registry: apache
           tag: 3.2.0
 
+        # 内置依赖的 bitnami 老标签（bitnami/postgresql:11.11.0 等）已下架，
+        # 统一换成 bitnamilegacy/* 等价标签（同架构，已验证镜像源可达）
+        postgresql:
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/postgresql
+            tag: 14.17.0-debian-12-r3
+        zookeeper:
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/zookeeper
+            tag: 3.8.1-debian-11-r0
+        minio:
+          image:
+            registry: docker.io
+            repository: bitnamilegacy/minio
+            tag: 2022.10.29-debian-11-r0
+
         # 实验环境各角色单副本
         master:
           replicas: 1
