@@ -32,10 +32,12 @@ spec:
           SECRET_KEY: "z9nKZiQud5Bttfdm2BHXgzLRE8Geoo6fm0QPOYKWKroiEfetY5TghQ9z"
 
         # apache/superset:6.1.0 镜像未内置 psycopg2 驱动，连接 PostgreSQL 元数据库必需。
-        # 借 chart 的 bootstrapScript 钩子，在容器启动前 pip 安装（走清华 PyPI 镜像）。
+        # 借 chart 的 bootstrapScript 钩子，在容器启动前安装（走清华 PyPI 镜像）。
+        # 注意：镜像的 venv(/app/.venv) 未内置 pip（uv 创建的瘦 venv），
+        #       所以用系统 pip 直接装进 venv 的 site-packages 目录。
         bootstrapScript: |
           #!/bin/bash
-          /app/.venv/bin/python -m pip install --no-cache-dir psycopg2-binary -i https://pypi.tuna.tsinghua.edu.cn/simple
+          /usr/local/bin/pip install --no-cache-dir --target=/app/.venv/lib/python3.10/site-packages psycopg2-binary -i https://pypi.tuna.tsinghua.edu.cn/simple
 
         # Argo CD 不执行 Helm hook（helm.sh/hook），会跳过 init-db Job，
         # 导致元数据库未建表 / admin 未创建。清空 jobAnnotations 去掉 hook 标注，
