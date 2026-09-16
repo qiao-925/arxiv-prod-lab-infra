@@ -1,9 +1,9 @@
 # ============================================================
 #  DolphinScheduler —— 任务编排
 # ============================================================
-#  特殊：官方已无公开 chart 仓库（apache.github.io/dolphinscheduler 已 404），
-#  但 chart 本体在源码树的 deploy/kubernetes/dolphinscheduler 下。
-#  Argo CD 支持直接以 git 路径作为 Helm chart 源 —— 仍是"现成的 helm"。
+#  写法：单 source（git 路径 chart）+ helm.values 内联参数。
+#  特殊：官方已无公开 chart 仓库，chart 本体在源码树
+#  deploy/kubernetes/dolphinscheduler 下，直接用 git 路径作为 chart 源。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -14,17 +14,30 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://github.com/apache/dolphinscheduler.git
-      targetRevision: 3.2.2
-      path: deploy/kubernetes/dolphinscheduler
-      helm:
-        releaseName: dolphinscheduler
-        valueFiles:
-          - $values/gitops/values/dolphinscheduler/values.yaml
+  source:
+    repoURL: https://github.com/apache/dolphinscheduler.git
+    targetRevision: 3.2.2
+    path: deploy/kubernetes/dolphinscheduler
+    helm:
+      releaseName: dolphinscheduler
+      values: |
+        image:
+          registry: apache
+          tag: 3.2.0
+
+        # 实验环境各角色单副本
+        master:
+          replicas: 1
+        worker:
+          replicas: 1
+        alert:
+          replicas: 1
+
+        # API/UI 用 NodePort 暴露
+        api:
+          service:
+            type: NodePort
+            nodePort: 30500
   destination:
     server: https://kubernetes.default.svc
     namespace: dolphinscheduler

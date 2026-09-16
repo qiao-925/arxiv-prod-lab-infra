@@ -1,6 +1,9 @@
 # ============================================================
 #  Prometheus + Grafana —— 可观测性与监控
 # ============================================================
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+#  ⚠️ 不要覆盖镜像 tag —— chart 版本与镜像版本绑定，手动改会不兼容。
+# ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,17 +13,48 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: kube-prometheus-stack
-      targetRevision: 91.4.0
-      helm:
-        releaseName: monitoring
-        valueFiles:
-          - $values/gitops/values/monitoring/values.yaml
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 91.4.0
+    helm:
+      releaseName: monitoring
+      values: |
+        prometheus:
+          prometheusSpec:
+            retention: 15d
+            resources:
+              requests:
+                memory: "1Gi"
+                cpu: "500m"
+              limits:
+                memory: "4Gi"
+                cpu: "2"
+          service:
+            type: NodePort
+            nodePort: 30902
+
+        grafana:
+          adminPassword: admin
+          service:
+            type: NodePort
+            nodePort: 30300
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+
+        # 实验环境单副本，避免资源浪费
+        alertmanager:
+          alertmanagerSpec:
+            replicas: 1
+
+        prometheusOperator:
+          admissionWebhooks:
+            enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

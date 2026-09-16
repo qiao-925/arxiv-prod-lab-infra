@@ -1,8 +1,10 @@
 # ============================================================
 #  Apache Superset —— BI 可视化
 # ============================================================
-#  注意：chart 仓库地址是 apache.github.io/superset
-#  （旧地址 apache-superset.github.io/helm-chart 已失效）
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+#  ⚠️ 关键：chart 默认从 Scarf 遥测代理域名拉镜像
+#  （apachesuperset.docker.scarf.sh），该域名不通会导致
+#  ImagePullBackOff。这里覆盖回 docker.io 短名，走 containerd 加速器。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -13,17 +15,17 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://apache.github.io/superset
-      chart: superset
-      targetRevision: 0.22.8
-      helm:
-        releaseName: superset
-        valueFiles:
-          - $values/gitops/values/superset/values.yaml
+  source:
+    repoURL: https://apache.github.io/superset
+    chart: superset
+    targetRevision: 0.22.8
+    helm:
+      releaseName: superset
+      values: |
+        # 覆盖掉 Scarf 代理域名，改走 docker.io（阶段一已配加速器）
+        image:
+          repository: apache/superset
+          tag: "6.1.0"
   destination:
     server: https://kubernetes.default.svc
     namespace: superset

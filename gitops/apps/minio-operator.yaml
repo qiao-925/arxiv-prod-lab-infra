@@ -1,12 +1,8 @@
 # ============================================================
-#  MinIO Operator —— 多源模式 (multi-source) 模板
+#  MinIO Operator —— S3 兼容对象存储（控制面）
 # ============================================================
-#  这是「现成 Helm + 自有 values」的标准写法，其余 Helm 型组件照抄：
-#
-#    source[0] = 你的 git 仓库 (ref: values)  → 只提供 values.yaml
-#    source[1] = 官方 Helm chart 仓库          → 提供 chart 本体
-#
-#  valueFiles 里的 $values 指向 source[0] 的 ref，路径是仓库内相对路径。
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+#  wave 0 装 Operator + CRD，真正的 MinIO 实例见 minio-tenant（wave 1）。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -14,34 +10,33 @@ metadata:
   name: minio-operator
   namespace: argocd
   annotations:
-    # wave 0：Operator 必须先于它管理的 CR 部署
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
-  sources:
-    # ---- 源1：git 仓库，仅用于取 values ----
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-
-    # ---- 源2：官方 Helm chart ----
-    - repoURL: https://operator.min.io/
-      chart: operator
-      targetRevision: 7.1.1
-      helm:
-        releaseName: minio-operator
-        valueFiles:
-          - $values/gitops/values/minio-operator/values.yaml
-
+  source:
+    repoURL: https://operator.min.io/
+    chart: operator
+    targetRevision: 7.1.1
+    helm:
+      releaseName: minio-operator
+      values: |
+        # 实验环境单节点，副本数从默认 2 降到 1，省内存
+        operator:
+          replicaCount: 1
+          env:
+            # 允许 Operator 管理 StatefulSet 形式的 Tenant
+            - name: OPERATOR_STS_ENABLED
+              value: "on"
+          image:
+            pullPolicy: IfNotPresent
   destination:
     server: https://kubernetes.default.svc
     namespace: minio-operator
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      # MinIO/Strimzi 的 CRD 很大，客户端 apply 会超 262144 字节注解上限
+      # MinIO/Strimzi 的 CRD 很大，客户端 apply 会超注解上限，须服务端 apply
       - ServerSideApply=true

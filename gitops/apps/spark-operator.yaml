@@ -1,6 +1,8 @@
 # ============================================================
 #  Spark Operator —— 离线批计算（控制面）
 # ============================================================
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+# ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,17 +12,22 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://kubeflow.github.io/spark-operator
-      chart: spark-operator
-      targetRevision: 2.5.2
-      helm:
-        releaseName: spark-operator
-        valueFiles:
-          - $values/gitops/values/spark-operator/values.yaml
+  source:
+    repoURL: https://kubeflow.github.io/spark-operator
+    chart: spark-operator
+    targetRevision: 2.5.2
+    helm:
+      releaseName: spark-operator
+      values: |
+        # 允许在 default 命名空间提交 SparkApplication
+        sparkJobNamespace: default
+
+        # 启用 admission webhook（校验 SparkApplication）
+        webhook:
+          enable: true
+
+        controller:
+          replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: spark-operator

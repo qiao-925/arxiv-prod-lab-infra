@@ -1,8 +1,9 @@
 # ============================================================
 #  Strimzi Kafka Operator —— 实时消息管道（控制面）
 # ============================================================
-#  Operator 本体。它负责把 Kafka CR 变成真正的 Kafka 集群。
-#  真正的 Kafka 集群在 gitops/manifests/kafka-cluster/（wave 1）
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+#  Operator 本体，负责把 Kafka CR 变成真正的集群。
+#  真正的 Kafka 集群在 manifests/kafka-cluster/（wave 1）。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -13,17 +14,20 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://strimzi.io/charts/
-      chart: strimzi-kafka-operator
-      targetRevision: 1.2.0
-      helm:
-        releaseName: strimzi-kafka-operator
-        valueFiles:
-          - $values/gitops/values/kafka-operator/values.yaml
+  source:
+    repoURL: https://strimzi.io/charts/
+    chart: strimzi-kafka-operator
+    targetRevision: 1.2.0
+    helm:
+      releaseName: strimzi-kafka-operator
+      values: |
+        # 关键：默认 watchNamespaces 为空 = 只看自己所在命名空间。
+        # 显式声明只监听 kafka 命名空间，与 Kafka CR 位置一致。
+        watchNamespaces:
+          - kafka
+
+        # 实验环境单副本
+        replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: kafka

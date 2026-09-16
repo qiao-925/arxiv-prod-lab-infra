@@ -1,11 +1,9 @@
 # ============================================================
 #  Flink Kubernetes Operator —— 实时流计算（控制面）
 # ============================================================
-#  依赖：cert-manager（wave 0）必须先就绪，否则 webhook 起不来。
-#  故本 App 放在 wave 1。
-#
-#  chart 来源：Apache 官方下载站（无 github.io chart 仓库）
-#  可用版本见 https://downloads.apache.org/flink/
+#  写法：单 source（chart 仓库）+ helm.values 内联参数。
+#  依赖：cert-manager（wave 0）必须先就绪，否则 webhook 起不来，故在 wave 1。
+#  chart 来源：Apache 官方下载站（无 github.io chart 仓库）。
 # ============================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -16,17 +14,23 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
-  sources:
-    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
-      targetRevision: main
-      ref: values
-    - repoURL: https://downloads.apache.org/flink/flink-kubernetes-operator-1.16.0/
-      chart: flink-kubernetes-operator
-      targetRevision: 1.16.0
-      helm:
-        releaseName: flink-kubernetes-operator
-        valueFiles:
-          - $values/gitops/values/flink-operator/values.yaml
+  source:
+    repoURL: https://downloads.apache.org/flink/flink-kubernetes-operator-1.16.0/
+    chart: flink-kubernetes-operator
+    targetRevision: 1.16.0
+    helm:
+      releaseName: flink-kubernetes-operator
+      values: |
+        # 只监听 flink 命名空间，避免集群级权限过大
+        watchNamespaces:
+          - flink
+
+        # webhook 依赖 cert-manager 签发证书，保持开启
+        webhook:
+          create: true
+
+        # 实验环境单副本
+        replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: flink

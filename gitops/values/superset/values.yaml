@@ -1,9 +1,0 @@
-# ============================================================
-#  Superset 参数（chart: superset/superset 0.22.8 / app 6.1.0）
-# ============================================================
-#  关键修复：chart 默认从 Scarf 遥测代理域名拉主镜像
-#  （apachesuperset.docker.scarf.sh），该域名不通 → ImagePullBackOff。
-#  改回 docker.io 短名，走阶段一配好的 docker.io 加速器。
-image:
-  repository: apache/superset
-  tag: "6.1.0"
