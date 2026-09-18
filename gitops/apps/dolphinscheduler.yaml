@@ -34,16 +34,28 @@ spec:
             registry: docker.io
             repository: bitnamilegacy/postgresql
             tag: 14.17.0-debian-12-r3
+          # ⚠️ 默认用 emptyDir（无持久化），pod 一重启元数据库 schema 就丢（t_ds_* 全没）。
+          # 必须开 PVC，否则每次重启都要重跑 schema 初始化。
+          persistence:
+            enabled: true
+            size: "20Gi"
+            storageClass: "-"
         zookeeper:
           image:
             registry: docker.io
             repository: bitnamilegacy/zookeeper
             tag: 3.8.1-debian-11-r0
+          persistence:
+            enabled: true
+            size: "20Gi"
+            storageClass: "-"
         minio:
           image:
             registry: docker.io
             repository: bitnamilegacy/minio
             tag: 2022.10.29-debian-11-r0
+          persistence:
+            enabled: true
 
         # 实验环境各角色单副本
         master:
