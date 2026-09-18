@@ -45,10 +45,6 @@ spec:
             registry: docker.io
             repository: bitnamilegacy/zookeeper
             tag: 3.8.1-debian-11-r0
-          persistence:
-            enabled: true
-            size: "20Gi"
-            storageClass: "-"
         minio:
           image:
             registry: docker.io
