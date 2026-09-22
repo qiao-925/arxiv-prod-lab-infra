@@ -39,7 +39,9 @@ spec:
           persistence:
             enabled: true
             size: "20Gi"
-            storageClass: "-"
+            # 不能用 "-"（会被渲染成 storageClassName:"" = 禁用动态供应，PVC 卡 Pending）。
+            # 显式用 k3s 默认的 local-path。
+            storageClass: "local-path"
         zookeeper:
           image:
             registry: docker.io
