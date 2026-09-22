@@ -78,3 +78,15 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+  # K8s 会给 StatefulSet 的 volumeClaimTemplates 自动回填 apiVersion/kind/volumeMode/status
+  # （PVC 状态反射），Helm 渲染的 target 里没有这些字段，导致 Argo CD 永远报 OutOfSync（幽灵 diff）。
+  # 这里显式忽略这些自动回填字段。
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: dolphinscheduler-postgresql
+      jsonPointers:
+        - /spec/volumeClaimTemplates/0/apiVersion
+        - /spec/volumeClaimTemplates/0/kind
+        - /spec/volumeClaimTemplates/0/spec/volumeMode
+        - /spec/volumeClaimTemplates/0/status
