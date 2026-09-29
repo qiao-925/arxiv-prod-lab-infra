@@ -1,0 +1,42 @@
+# ============================================================
+#  arxiv-pipeline Application —— 业务管道入口
+# ============================================================
+#  作用：让 Argo CD 监控 arxiv-prod-lab-pipeline 仓库的 k8s/ 目录
+#  该目录下的 KafkaTopic、PG Schema、CronJob 会被自动同步到集群
+#
+#  部署方式：push 到 infra 仓库后，root-app 自动发现并创建此 Application
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: arxiv-pipeline
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/qiao-925/arxiv-prod-lab-pipeline.git
+    targetRevision: main
+    path: k8s
+    directory:
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
