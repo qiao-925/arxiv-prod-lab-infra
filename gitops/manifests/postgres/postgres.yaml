@@ -76,8 +76,11 @@ metadata:
   name: postgres
   namespace: database
 spec:
+  # NodePort：让集群外（远程访问层 100.67.21.115 / DBeaver）能直连。
+  type: NodePort
   selector:
     app: postgres
   ports:
     - port: 5432
       targetPort: 5432
+      nodePort: 30432

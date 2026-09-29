@@ -42,6 +42,12 @@ spec:
             # 不能用 "-"（会被渲染成 storageClassName:"" = 禁用动态供应，PVC 卡 Pending）。
             # 显式用 k3s 默认的 local-path。
             storageClass: "local-path"
+          # 元数据库开 NodePort，供外部工具（DBeaver 等）直连。
+          # 注意：此 chart 依赖 bitnami/postgresql 10.3.18，节点端口键是 nodePort（单数标量）。
+          primary:
+            service:
+              type: NodePort
+              nodePort: 30434
         zookeeper:
           image:
             registry: docker.io

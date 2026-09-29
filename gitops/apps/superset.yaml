@@ -44,6 +44,15 @@ spec:
         # 让 init-db 变成普通 Job，由 Argo CD 正常创建执行。
         init:
           jobAnnotations: {}
+
+        # 元数据库开 NodePort，供外部工具（DBeaver 等）直连。
+        # 注意：此 chart 依赖 bitnami/postgresql 16.x，节点端口键是 nodePorts.postgresql（复数）。
+        postgresql:
+          primary:
+            service:
+              type: NodePort
+              nodePorts:
+                postgresql: 30433
   destination:
     server: https://kubernetes.default.svc
     namespace: superset
