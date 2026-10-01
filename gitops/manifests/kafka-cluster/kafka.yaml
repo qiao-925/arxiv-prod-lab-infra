@@ -54,6 +54,23 @@ spec:
         port: 29092
         type: nodeport
         tls: false
+        configuration:
+          # 固定 bootstrap 的 nodePort（避免重建时漂移）
+          bootstrap:
+            nodePort: 30966
+          # 每个 broker 固定 nodePort + advertisedHost 用 Tailscale IP。
+          # 原因：NodePort 默认 advertise 节点内网 IP(192.168.1.7)，
+          #       纯 Tailscale 远程客户端连不到内网 IP，必须 advertise 100.67.21.115。
+          brokers:
+            - broker: 0
+              nodePort: 32244
+              advertisedHost: 100.67.21.115
+            - broker: 1
+              nodePort: 31628
+              advertisedHost: 100.67.21.115
+            - broker: 2
+              nodePort: 31167
+              advertisedHost: 100.67.21.115
     config:
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
