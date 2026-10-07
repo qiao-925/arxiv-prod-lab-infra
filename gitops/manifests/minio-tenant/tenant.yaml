@@ -4,19 +4,25 @@
 #  Operator 由 Helm 装（wave 0），Tenant 是业务配置（wave 1）。
 #  依赖 tenants.minio.min.io CRD —— 该 CRD 由 minio-operator chart 提供。
 #
+#  ⚠️ Operator v7 的 Tenant CRD 约束（违反则 Tenant 直接被 API Server 拒绝）：
+#    1. spec.exposeServices.minio / console 是【布尔值】（是否创建 Service），
+#       不是对象。CRD 里根本没有 nodePort 字段 —— 要 NodePort 必须另写 Service。
+#    2. 根凭据只认 spec.configuration.name 指向的 Secret，且该 Secret 必须带
+#       config.env 键（内容为 export MINIO_ROOT_USER / MINIO_ROOT_PASSWORD ...）。
+#       旧字段 credentialsSecret 在 v7 已不存在，写了会被静默剪掉 → 无凭据起不来。
+#    3. requestAutoCert: false → 走 HTTP：S3=9000，Console=9090（TLS 时 9443）。
+#
+#  🔐 凭据 Secret（minio-creds）【刻意不纳入 Git】—— 本仓库是公开的，凭据不入库。
+#     需在同步前手工创建（或由外部密钥管理注入），并打注解避免被 Argo 剪除：
+#
+#       kubectl -n minio create secret generic minio-creds \
+#         --from-literal=config.env="$(printf 'export MINIO_ROOT_USER=%s\nexport MINIO_ROOT_PASSWORD=%s' "$U" "$P")"
+#       kubectl -n minio annotate secret minio-creds \
+#         argocd.argoproj.io/sync-options=Prune=false --overwrite
+#
 #  ⚠️ 资源提示：servers × volumesPerServer = PVC 数量。
 #     单机实验环境建议 servers: 1；生产可调大。
 # ============================================================
-apiVersion: v1
-kind: Secret
-metadata:
-  name: minio-creds
-  namespace: minio
-type: Opaque
-stringData:
-  accesskey: "minioadmin"
-  secretkey: "minioadmin123"
----
 apiVersion: minio.min.io/v2
 kind: Tenant
 metadata:
@@ -34,15 +40,51 @@ spec:
           resources:
             requests:
               storage: 50Gi
-  credentialsSecret:
+  # 根凭据 Secret（Operator v7 的字段名是 configuration.name）
+  # 该 Secret 由集群外手工维护，不在本 manifest 中定义。
+  configuration:
     name: minio-creds
-  # 控制台与 S3 API 用 NodePort 暴露
+  # 让 Operator 创建 ClusterIP Service：
+  #   S3 API  → 名为 minio（9000，集群内即 minio.minio:9000）
+  #   Console → 名为 arxiv-tenant-console（9090）
   exposeServices:
-    console:
-      type: NodePort
-      nodePort: 30901
-    minio:
-      type: NodePort
-      nodePort: 30900
+    minio: true
+    console: true
   # 关掉自动 TLS，实验环境用 HTTP，省去证书麻烦
   requestAutoCert: false
+---
+# ============================================================
+#  NodePort 暴露 —— Tenant CRD 不支持 nodePort，只能独立 Service。
+#  选择器用 Operator 给 Pod 打的标签（见 operator names.go/labels.go）：
+#    MinIO Pod   → v1.min.io/tenant:  arxiv-tenant
+#    Console Pod → v1.min.io/console: arxiv-tenant-console
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-s3-nodeport
+  namespace: minio
+spec:
+  type: NodePort
+  selector:
+    v1.min.io/tenant: arxiv-tenant
+  ports:
+    - name: s3
+      port: 9000
+      targetPort: 9000
+      nodePort: 30900
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-nodeport
+  namespace: minio
+spec:
+  type: NodePort
+  selector:
+    v1.min.io/console: arxiv-tenant-console
+  ports:
+    - name: console
+      port: 9090
+      targetPort: 9090
+      nodePort: 30901
