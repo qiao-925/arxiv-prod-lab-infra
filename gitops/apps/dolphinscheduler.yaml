@@ -62,10 +62,35 @@ spec:
             enabled: true
 
         # 实验环境各角色单副本
+        #
+        # ⚠️ 过载保护必须调：DS 的 master/worker 用「宿主机」内存百分比做准入判断
+        #    （容器里读到的 /proc/meminfo 就是宿主机的），默认 reserved-memory=0.3
+        #    意味着「宿主机必须剩 30% 空闲内存（本机 32G → 9.6G）才干活」。
+        #    本机同时跑 kafka/minio/prometheus/argocd/superset/flink，实测 master
+        #    上报 2.4%、worker 上报 8.3%，于是：
+        #      master → "The current server is overload, cannot consumes commands"
+        #              → 工作流命令永远不会被消费，任务全卡在队列里
+        #      worker → "available memory 0.08 is lower than 0.3" → 不接受派发
+        #    置 0 关闭该判断（对比式 available < reserved，0 恒不成立）。
         master:
           replicas: 1
+          env:
+            MASTER_RESERVED_MEMORY: "0"
+          # 默认 resources 为空 = BestEffort，节点内存紧张时第一个被驱逐
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1536Mi"
         worker:
           replicas: 1
+          env:
+            WORKER_RESERVED_MEMORY: "0"
+            # 宿主机 12 核，load average 常年 1~3，而默认阈值是 1 → 每次心跳都误报过载
+            WORKER_MAX_CPU_LOAD_AVG: "8"
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
         alert:
           replicas: 1
 
