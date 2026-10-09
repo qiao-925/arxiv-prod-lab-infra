@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7cb13bce-1e3f-43dc-8f44-47e95bada441" name="Changes" comment="arxiv-pipeline: set CreateNamespace=true">
+      <change beforePath="$PROJECT_DIR$/gitops/apps/arxiv-pipeline.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/apps/arxiv-pipeline.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/job-dolphinscheduler-schema-initializer.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/job-dolphinscheduler-schema-initializer.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/values.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/values.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseLocalColorSettings">
+    <colors>
+      <entry key="1a78e375-d8f3-478e-869c-25b1a45d3ebf" value="" />
+    </colors>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/psycopg2/__init__.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/pyspark/java_gateway.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/pyspark/testing/utils.py" root0="SKIP_INSPECTION" />
+    <setting file="file:///usr/lib/python3.14/os.py" root0="SKIP_INSPECTION" />
+    <setting file="file:///usr/lib/python3.14/subprocess.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3KAHubhL7h9fmOyqOMYHSosoEub" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests in feasibility_test.executor": "Run",
+    "Python.config.executor": "Run",
+    "Python.cross_validate_arxiv_dataset_and_arxiv_api_test.executor": "Run",
+    "Python.dataset_steaming_read_deep_page_delay_time_control_grop_test.executor": "Run",
+    "Python.infisical_fs_test.executor": "Run",
+    "Python.run_e2e_test.executor": "Debug",
+    "Python.run_test.executor": "Debug",
+    "Python.smoke_config (1).executor": "Run",
+    "Python.smoke_config.executor": "Run",
+    "Python.spark_release_date_preprocess_fs_test.executor": "Run",
+    "Python.test_config.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/qiao/arxiv-prod-lab-infra",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "terminal"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+      <recent name="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/scripts" />
+      <recent name="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/smoke_test" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.cross_validate_arxiv_dataset_and_arxiv_api_test">
+    <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arxiv-prod-lab-infra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="cross_validate_arxiv_dataset_and_arxiv_api_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="scholar-lake" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test/cross_validate_arxiv_dataset_and_arxiv_api_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="dataset_steaming_read_deep_page_delay_time_control_grop_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="scholar-lake" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test/dataset_steaming_read_deep_page_delay_time_control_grop_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run_e2e_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="scholar-lake" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/run_e2e_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="smoke_config" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="scholar-lake" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/smoke_test/smoke_config.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in feasibility_test" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="scholar-lake" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.Unnamed" />
+      <item itemvalue="Python.cross_validate_arxiv_dataset_and_arxiv_api_test" />
+      <item itemvalue="Python.dataset_steaming_read_deep_page_delay_time_control_grop_test" />
+      <item itemvalue="Python.run_e2e_test" />
+      <item itemvalue="Python.smoke_config" />
+      <item itemvalue="Python tests.Python tests in feasibility_test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.cross_validate_arxiv_dataset_and_arxiv_api_test" />
+        <item itemvalue="Python.dataset_steaming_read_deep_page_delay_time_control_grop_test" />
+        <item itemvalue="Python tests.Python tests in feasibility_test" />
+        <item itemvalue="Python.run_e2e_test" />
+        <item itemvalue="Python.smoke_config" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-821f704e66d9-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.9437.214" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7cb13bce-1e3f-43dc-8f44-47e95bada441" name="Changes" comment="" />
+      <created>1790993675816</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1790993675816</updated>
+      <workItem from="1790993676820" duration="15360000" />
+      <workItem from="1791079531262" duration="19447000" />
+      <workItem from="1791183990629" duration="14282000" />
+      <workItem from="1791251731411" duration="10690000" />
+      <workItem from="1791357550971" duration="6532000" />
+      <workItem from="1791422403055" duration="2545000" />
+      <workItem from="1791424968795" duration="47000" />
+      <workItem from="1791446419753" duration="1440000" />
+      <workItem from="1791457327293" duration="2259000" />
+      <workItem from="1791512756068" duration="2770000" />
+    </task>
+    <task id="LOCAL-00001" summary="feat: arXiv 数据管道 — 逐日回放至 Kafka + PG 记账&#10;&#10;实现从 HuggingFace 拉取 arXiv 论文、按发布日期分区 Parquet、&#10;逐日推送到 Kafka 并用 PostgreSQL 记录进度的完整链路。&#10;&#10;- common/     共享组件：惰性加载的 config（Infisical 密钥）、&#10;              KafkaClient / PGClient 封装、路径常量、统一日志&#10;- jobs/       job_daily_push：逐日推送，5 秒 = 1 天；断点续传按&#10;              (job_name, publish_date) 记账，PENDING 作崩溃锚点&#10;- tools/      download（HuggingFace → JSONL）、preprocess（JSONL&#10;              → 按日期分区 Parquet），均幂等带 _completed 标记&#10;- tests/      smoke_test 验证连接可达；run_e2e_test 全链路对账&#10;- sql/        daily_push_log DDL&#10;&#10;环境隔离靠资源名后缀：test / prod 共享基础设施，靠&#10;-arxiv-papers-test / arxiv_test 等区分；ENV 未设即报错。">
+      <option name="closed" value="true" />
+      <created>1791199398665</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1791199398666</updated>
+    </task>
+    <task id="LOCAL-00002" summary="arxiv-pipeline: set CreateNamespace=true">
+      <option name="closed" value="true" />
+      <created>1791515030573</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1791515030573</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: arXiv 数据管道 — 逐日回放至 Kafka + PG 记账&#10;&#10;实现从 HuggingFace 拉取 arXiv 论文、按发布日期分区 Parquet、&#10;逐日推送到 Kafka 并用 PostgreSQL 记录进度的完整链路。&#10;&#10;- common/     共享组件：惰性加载的 config（Infisical 密钥）、&#10;              KafkaClient / PGClient 封装、路径常量、统一日志&#10;- jobs/       job_daily_push：逐日推送，5 秒 = 1 天；断点续传按&#10;              (job_name, publish_date) 记账，PENDING 作崩溃锚点&#10;- tools/      download（HuggingFace → JSONL）、preprocess（JSONL&#10;              → 按日期分区 Parquet），均幂等带 _completed 标记&#10;- tests/      smoke_test 验证连接可达；run_e2e_test 全链路对账&#10;- sql/        daily_push_log DDL&#10;&#10;环境隔离靠资源名后缀：test / prod 共享基础设施，靠&#10;-arxiv-papers-test / arxiv_test 等区分；ENV 未设即报错。" />
+    <MESSAGE value="arxiv-pipeline: set CreateNamespace=true" />
+    <option name="LAST_COMMIT_MESSAGE" value="arxiv-pipeline: set CreateNamespace=true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common/config.py</url>
+          <line>14</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common/config.py</url>
+          <line>101</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common/config.py</url>
+          <line>90</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/run_e2e_test.py</url>
+          <line>92</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common/paths.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common/paths.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/run_e2e_test.py</url>
+          <line>290</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$smoke_config__1_.coverage" NAME="smoke_config (1) Coverage Results" MODIFIED="1791101613610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$test_config.coverage" NAME="test_config Coverage Results" MODIFIED="1791099772260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$smoke_config.coverage" NAME="smoke_config Coverage Results" MODIFIED="1791184204530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$spark_release_date_preprocess_fs_test.coverage" NAME="spark_release_date_preprocess_fs_test Coverage Results" MODIFIED="1790999542616" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$run_test.coverage" NAME="run_test Coverage Results" MODIFIED="1791011055972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$infisical_fs_test.coverage" NAME="infisical_fs_test Coverage Results" MODIFIED="1791100533987" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$config.coverage" NAME="config Coverage Results" MODIFIED="1791101796575" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/common" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$.coverage" NAME=" Coverage Results" MODIFIED="1791252252102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$run_e2e_test.coverage" NAME="run_e2e_test Coverage Results" MODIFIED="1791190303867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$cross_validate_arxiv_dataset_and_arxiv_api_test.coverage" NAME="cross_validate_arxiv_dataset_and_arxiv_api_test Coverage Results" MODIFIED="1791361176916" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+    <SUITE FILE_PATH="coverage/arxiv_prod_lab_infra$dataset_steaming_read_deep_page_delay_time_control_grop_test.coverage" NAME="dataset_steaming_read_deep_page_delay_time_control_grop_test Coverage Results" MODIFIED="1791252262429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../arxiv-prod-lab-pipeline/tests/feasibility_test" />
+  </component>
+</project>
