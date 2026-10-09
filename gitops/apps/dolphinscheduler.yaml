@@ -71,11 +71,13 @@ spec:
         #      master → "The current server is overload, cannot consumes commands"
         #              → 工作流命令永远不会被消费，任务全卡在队列里
         #      worker → "available memory 0.08 is lower than 0.3" → 不接受派发
-        #    置 0 关闭该判断（对比式 available < reserved，0 恒不成立）。
+        #    置 0 不行！DS 把 0 当非法值回退成 100.0（=要求 100% 空闲），比默认更狠。
+        #    必须给一个极小正数：0.000001 ≈ 要求宿主机留 32KB 空闲，等于关掉。
+        #    配合下面的 requests 一起用：过载控制交给 K8s 调度器。
         master:
           replicas: 1
           env:
-            MASTER_RESERVED_MEMORY: "0"
+            MASTER_RESERVED_MEMORY: "0.000001"
           # 默认 resources 为空 = BestEffort，节点内存紧张时第一个被驱逐
           resources:
             requests:
@@ -84,7 +86,8 @@ spec:
         worker:
           replicas: 1
           env:
-            WORKER_RESERVED_MEMORY: "0"
+            # 同 master：0 会被回退成 100，必须用极小正数
+            WORKER_RESERVED_MEMORY: "0.000001"
             # 宿主机 12 核，load average 常年 1~3，而默认阈值是 1 → 每次心跳都误报过载
             WORKER_MAX_CPU_LOAD_AVG: "8"
           resources:
