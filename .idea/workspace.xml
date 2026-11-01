@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7cb13bce-1e3f-43dc-8f44-47e95bada441" name="Changes" comment="arxiv-pipeline: set CreateNamespace=true">
-      <change beforePath="$PROJECT_DIR$/gitops/apps/arxiv-pipeline.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/apps/arxiv-pipeline.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/job-dolphinscheduler-schema-initializer.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/job-dolphinscheduler-schema-initializer.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/values.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/values.yaml" afterDir="false" />
+    <list default="true" id="7cb13bce-1e3f-43dc-8f44-47e95bada441" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +39,16 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="SYNC" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "history": [
+    {
+      "assignee": "qiao-925"
+    }
+  ],
+  "lastFilter": {
+    "assignee": "qiao-925"
+  }
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/psycopg2/__init__.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/pyspark/java_gateway.py" root0="SKIP_INSPECTION" />
@@ -78,7 +86,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "feature/loki-logging",
     "last_opened_file_path": "/home/qiao/arxiv-prod-lab-infra",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.jshint": "true",
