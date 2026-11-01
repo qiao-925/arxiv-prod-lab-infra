@@ -6,6 +6,50 @@
   <component name="ChangeListManager">
     <list default="true" id="7cb13bce-1e3f-43dc-8f44-47e95bada441" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/cert-manager.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/gitops/apps/cert-manager.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/dolphinscheduler.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/flink-operator.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/kafka-cluster.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/kafka-operator.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/apps/superset.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/.helmignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/Chart.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/README.md.gotmpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/charts/minio-11.10.13.tgz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/charts/mysql-9.4.1.tgz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/charts/postgresql-10.3.18.tgz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/charts/zookeeper-6.5.3.tgz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/NOTES.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/_helpers.tpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap-dolphinscheduler-alert.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap-dolphinscheduler-api.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap-dolphinscheduler-common.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap-dolphinscheduler-master.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap-dolphinscheduler-worker.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/configmap.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/deployment-dolphinscheduler-alert.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/deployment-dolphinscheduler-api.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/ingress.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/job-dolphinscheduler-schema-initializer.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/keda-autoscaler-worker.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/pvc-dolphinscheduler-alert.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/pvc-dolphinscheduler-api.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/pvc-dolphinscheduler-fs-file.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/pvc-dolphinscheduler-shared.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/rbac.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/secret-external-database.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/secret-external-etcd-ssl.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/secret-external-ldap-ssl.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/secret-registry-database.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/statefulset-dolphinscheduler-master.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/statefulset-dolphinscheduler-worker.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/svc-dolphinscheduler-alert.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/svc-dolphinscheduler-api.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/svc-dolphinscheduler-master-headless.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/templates/svc-dolphinscheduler-worker-headless.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/charts/dolphinscheduler/values.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitops/manifests/kafka-cluster/kafka.yaml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,9 +95,8 @@
 }]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/psycopg2/__init__.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/pyspark/java_gateway.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/../arxiv-prod-lab-pipeline/.venv/lib/python3.14/site-packages/pyspark/testing/utils.py" root0="SKIP_INSPECTION" />
     <setting file="file:///usr/lib/python3.14/os.py" root0="SKIP_INSPECTION" />
+    <setting file="file:///usr/lib/python3.14/pathlib/__init__.py" root0="SKIP_INSPECTION" />
     <setting file="file:///usr/lib/python3.14/subprocess.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProjectColorInfo">{
