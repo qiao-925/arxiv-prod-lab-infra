@@ -1,0 +1,243 @@
+# ============================================================
+#  kube-prometheus-stack
+# ============================================================
+#
+#  基线版本：chart 91.4.0
+#
+#  官方基线来源（升级/排查时查阅）：
+#    本版本 values.yaml:
+#      https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-91.4.0/charts/kube-prometheus-stack/values.yaml
+#    Raw 直链（便于 curl / diff）:
+#      https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-91.4.0/charts/kube-prometheus-stack/values.yaml
+#    本版本 Release:
+#      https://github.com/prometheus-community/helm-charts/releases/tag/kube-prometheus-stack-91.4.0
+#    全部版本列表:
+#      https://github.com/prometheus-community/helm-charts/releases?q=kube-prometheus-stack
+#    Artifact Hub:
+#      https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+#
+# ────────────────────────────────────────────────────────────
+#  本文件结构
+# ────────────────────────────────────────────────────────────
+#
+#  PART 1  官方基线（使用默认值，不覆盖，仅列出供参考）
+#  PART 2  自定义覆盖（实际生效的配置）
+#           2.1  K3s 适配
+#           2.2  监控范围扩展
+#           2.3  环境特定
+#
+#  配置区只有分区标头，无字段级注释。
+#  需要理解某个配置时，回到本文件头部的对应小节查阅。
+#
+# ────────────────────────────────────────────────────────────
+#  PART 1 · 官方基线（使用默认值，不覆盖）
+# ────────────────────────────────────────────────────────────
+#
+#  以下配置使用 chart 91.4.0 官方默认值，本文件不覆盖。
+#  升级 chart 时自动继承新版默认。
+#
+#  组件开关：
+#    crds.enabled                                = true
+#    prometheusOperator.enabled                  = true
+#    prometheusOperator.admissionWebhooks.enabled = true
+#    prometheus.enabled                          = true
+#    alertmanager.enabled                        = true
+#    grafana.enabled                             = true
+#    nodeExporter.enabled                        = true
+#    kubeStateMetrics.enabled                    = true
+#
+#  规则：
+#    defaultRules.create                         = true
+#
+#  其余所有字段使用官方默认值。
+#  注：retention 官方默认 10d，本文件覆盖为 15d（见 2.3）。
+#
+# ────────────────────────────────────────────────────────────
+#  PART 2 · 自定义覆盖
+# ────────────────────────────────────────────────────────────
+#
+# ── 2.1 K3s 适配 ────────────────────────────────────────────
+#
+#  K3s 把 kube-proxy / kube-scheduler / kube-controller-manager
+#  打包进 k3s server 主进程，不暴露标准指标端口。
+#
+#  影响：Prometheus 抓不到这三个组件的指标
+#        → 对应告警规则持续处于 no data
+#
+#  修复：两处配对关闭
+#    - kubeProxy.enabled: false              → 不生成 ServiceMonitor
+#    - kubeScheduler.enabled: false          → 不生成 ServiceMonitor
+#    - kubeControllerManager.enabled: false  → 不生成 ServiceMonitor
+#    - defaultRules.rules.*: false           → 不生成 PrometheusRule
+#
+#  为什么两处都要关：
+#    只关 enabled：规则还在，但抓不到数据 → no data 噪音
+#    只关 rules  ：抓取还在，但结果没人用 → 空转
+#
+#  适用：仅 K3s。若换到标准 K8s（kube-proxy 等作为独立 Pod），
+#        删掉本节即可恢复。
+#
+# ── 2.2 监控范围扩展 ────────────────────────────────────────
+#
+#  官方默认行为：Prometheus 只发现「与当前 Helm release 同属」的
+#                 ServiceMonitor / PodMonitor / PrometheusRule。
+#
+#  影响：未来给 kafka / minio / postgres 加 ServiceMonitor 时，
+#        如果不打 release 标签，Prometheus 看不到。
+#
+#  修复：三个 selectorNilUsesHelmValues 置 false
+#    - serviceMonitorSelectorNilUsesHelmValues: false
+#    - podMonitorSelectorNilUsesHelmValues: false
+#    - ruleSelectorNilUsesHelmValues: false
+#
+#  含义：任何带对应 CRD 的资源都会被识别，不再限制 release。
+#
+#  适用：通用。生产环境也常这样配，不限于实验环境。
+#
+# ── 2.3 环境特定 ────────────────────────────────────────────
+#
+#  Prometheus 存储与保留：
+#    官方默认：retention 10d，无 retentionSize，emptyDir
+#    本环境：
+#      retention 15d           —— 回溯窗口从 10 天延长到 15 天
+#      retentionSize 15GB      —— 容量上限，防止指标暴涨写满 PVC
+#      storageSpec 20Gi PVC    —— 持久化，Pod 重建不丢指标
+#
+#    retentionSize 的必要性：
+#      官方只按时间清理。若指标量在某段时间暴涨（如新增大量
+#      ServiceMonitor），15 天内就可能把 PVC 写满 → Prometheus
+#      拒绝写入 → 崩溃。加容量上限后，时间和容量哪个先触发
+#      就按哪个清理。
+#
+#  Prometheus 资源规划：
+#    实测：单节点 1-2 万 series 时，空闲占用 300-800Mi
+#    requests 1.5Gi —— 高于官方默认，避免节点紧张时被驱逐
+#    limits 4Gi     —— 覆盖峰值（复杂查询、高基数）
+#
+#  Prometheus NodePort 30902：
+#    官方默认 ClusterIP，仅集群内可达。
+#    本环境需从远程 IP + 端口访问，故用 NodePort。
+#
+#  Grafana：
+#    NodePort 30300        —— 同上，远程访问
+#    adminPassword: admin  —— 官方默认 prom-operator，
+#                             本环境改为 admin（实验环境可接受；
+#                             安全加固时改用 grafana.admin.existingSecret）
+#    resources             —— 介于官方默认与生产建议之间
+#
+#  Alertmanager：
+#    replicas: 1           —— 官方默认 1，显式写出表达"有意选择单副本"。
+#                             生产建议 3 副本（奇数选主），实验环境接受单点。
+#    未配置 config         —— 默认 null receiver，告警只在 Alertmanager
+#                             UI 可见，不推送外部通知渠道。
+#                             需要时再加 webhook_configs。
+#
+# ────────────────────────────────────────────────────────────
+#  维护约定
+# ────────────────────────────────────────────────────────────
+#
+#  修改本文件时：
+#    - PART 1 的默认值清单     —— 升级 chart 时跟着官方对齐
+#    - 2.1 K3s 适配            —— 换非 K3s 集群时删除
+#    - 2.2 监控范围扩展        —— 通用，一般不动
+#    - 2.3 环境特定            —— 常规调优（资源/端口/保留期），
+#                                 改完回来更新本节说明
+#
+#  升级 chart 时：
+#    1. 看 https://github.com/prometheus-community/helm-charts/releases?q=kube-prometheus-stack
+#    2. diff 官方 values.yaml（用头部的 Raw 直链）
+#    3. 检查变更是否涉及 2.1 / 2.3 的字段
+#
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  labels:
+    system: observability
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 91.4.0
+    helm:
+      releaseName: kps          # 短名，避免 Pod 名超 63 字符
+      values: |
+
+        # ── 2.1 K3s 适配 ──────────────────────────────────────
+        kubeProxy:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+
+        defaultRules:
+          rules:
+            kubeProxy: false
+            kubeScheduler: false
+            kubeControllerManager: false
+
+        # ── 2.2 + 2.3 Prometheus ──────────────────────────────
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+
+            retention: 15d
+            retentionSize: 15GB
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: local-path
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 20Gi
+
+            resources:
+              requests:
+                memory: "1536Mi"
+                cpu: "500m"
+              limits:
+                memory: "4Gi"
+                cpu: "2"
+
+          service:
+            type: NodePort
+            nodePort: 30902
+
+        # ── 2.3 Grafana ───────────────────────────────────────
+        grafana:
+          adminPassword: admin
+          service:
+            type: NodePort
+            nodePort: 30300
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+
+        # ── 2.3 Alertmanager ──────────────────────────────────
+        alertmanager:
+          alertmanagerSpec:
+            replicas: 1
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

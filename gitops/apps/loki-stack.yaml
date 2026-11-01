@@ -1,0 +1,333 @@
+# ============================================================
+#  loki-stack —— 日志栈（Loki + Promtail + Grafana datasource）
+# ============================================================
+#
+#  基线版本：
+#    Loki     chart 20.0.3（appVersion 3.7.9）
+#    Promtail chart 6.17.1（appVersion 3.0.0）
+#
+#  官方 values：
+#    Loki:
+#      https://github.com/grafana-community/helm-charts/blob/loki-20.0.3/charts/loki/values.yaml
+#    Promtail:
+#      https://github.com/grafana/helm-charts/blob/promtail-6.17.1/charts/promtail/values.yaml
+#
+#  版本列表：
+#    https://github.com/grafana-community/helm-charts/releases?q=loki
+#    https://github.com/grafana/helm-charts/releases?q=promtail
+#
+# ────────────────────────────────────────────────────────────
+#  组件构成（3 个 source）
+# ────────────────────────────────────────────────────────────
+#
+#  Source 1 · Loki（日志存储与查询）
+#    - 作用：接收 Promtail 推送的日志，按标签建索引，压缩存 PVC，
+#            响应 Grafana 的 LogQL 查询
+#    - 形态：SingleBinary，Distributor / Ingester / Querier / Compactor
+#            打包在一个进程
+#    - 写入路径：Promtail → Distributor → Ingester → PVC
+#    - 查询路径：Grafana → Querier → Ingester（热）+ PVC（冷）
+#
+#  Source 2 · Promtail（日志采集）
+#    - 作用：DaemonSet，每节点一个，读 /var/log/pods/ 下所有 Pod 的
+#            stdout/stderr，附加 namespace/pod/container 标签后推送 Loki
+#    - 采集对象：节点上所有 Pod，无需改应用代码
+#    - EOL 警告：2026-03-02 已 EOL，迁移 Alloy 时只改本 source，
+#                Loki 和 datasource 无需变更
+#
+#  Source 3 · Grafana datasource（Grafana 配置）
+#    - 作用：一个 ConfigMap，带 grafana_datasource: "1" 标签，
+#            被 Grafana sidecar（grafana-sc-datasources）自动加载，
+#            在 Grafana 里出现 Loki 数据源
+#    - 不是服务：没有 Pod，只存一段 YAML 配置
+#    - 位置：gitops/manifests/loki-stack/configmap.yaml
+#
+# ────────────────────────────────────────────────────────────
+#  PART 1 · 官方基线（默认值，不覆盖）
+# ────────────────────────────────────────────────────────────
+#
+#  Loki 使用默认值：
+#    serviceAccount.create / rbac.create            = true
+#    networkPolicy.enabled / serviceMonitor.enabled = false
+#    loki.server.http_listen_port                   = 3100
+#    loki.server.grpc_listen_port                   = 9095
+#
+#  Promtail 使用默认值：
+#    daemonset.enabled                  = true
+#    config.snippets.scrapeConfigs      = 内置 K8s SD，自动发现所有 Pod
+#                                         并附加 namespace/pod/container/app 标签
+#    serviceAccount.create / rbac.create = true
+#
+#  以下覆盖的字段之外，全部走官方默认。
+#
+# ────────────────────────────────────────────────────────────
+#  PART 2 · 自定义覆盖（逐 source 说明）
+# ────────────────────────────────────────────────────────────
+#
+# ── 2.1 Loki 关键配置 ───────────────────────────────────────
+#
+#  deploymentMode: SingleBinary
+#    - 默认 simpleScalable（read/write/backend 三组独立伸缩）
+#    - 日志量远低于 1TB/天，SingleBinary 把内部组件打包 1 进程
+#    - 收益：1 个 Pod 跑全栈，省资源；代价：无法横向扩某组件
+#
+#  gateway.enabled: false
+#    - chart 20.x 默认 true，创建 nginx gateway Deployment
+#    - SingleBinary 不需要 gateway，且它监听 8080 会干扰 readiness probe
+#    - 不关 → loki-0 的 probe 探 8080 失败 → CrashLoopBackOff
+#
+#  backend/read/write.replicas: 0
+#    - 默认 3，SingleBinary 下这三组组件打包在主进程，独立副本无意义
+#    - 不关 → 多起 3 组无用 Pod
+#
+#  chunksCache/resultsCache.enabled: false
+#    - 默认 true，会创建 memcached Pod 作为查询缓存
+#    - SingleBinary 单节点内存有限，memcached 挤占资源
+#    - 关掉后查询稍慢但省内存
+#
+#  lokiCanary/test.enabled: false
+#    - lokiCanary 默认 true，定期写入测试日志验证 Loki 可用
+#    - test 默认 true，helm test 用
+#    - 实验环境两者都不需要，关掉省一个 Pod
+#
+#  monitoring.selfMonitoring.enabled: false
+#    - 默认 true，会安装 Grafana Agent Operator 做自监控
+#    - 本环境已有 kube-prometheus-stack，重复安装会 CRD 冲突
+#
+#  loki.auth_enabled: false
+#    - 默认 true，要求请求带 X-Scope-OrgID header（多租户）
+#    - 单租户场景关掉，Promtail 和 Grafana 都不用额外配 header
+#
+#  loki.commonConfig.replication_factor: 1
+#    - 默认 3，单节点必须 1，否则写入会因为"无法复制到 3 个副本"失败
+#
+#  loki.storage.type: filesystem
+#    - 默认 s3，需要 S3 后端
+#    - 本环境无 S3，用本地文件系统
+#
+#  loki.compactor:
+#    - working_directory: /var/loki/compactor
+#        必须在 PVC 内（/var/loki 下），Pod 重建后工作目录不丢
+#    - retention_enabled: true（默认 false）
+#        开启后 compactor 会按 retention_period 清理旧数据
+#    - delete_request_store: filesystem
+#        retention 开启时必需，指定删除请求的标记存哪
+#    - ⚠️ Loki 3.x 已移除 shared_store 字段
+#        写了会报 "field shared_store not found in type compactor.Config"
+#        存储位置统一由 loki.storage 决定，compactor 不再单独配
+#
+#  loki.limits_config:
+#    - retention_period: 720h（30 天，默认 744h = 31 天）
+#    - max_query_series: 500
+#        单次查询最多返回 500 条 series，防止高基数查询打爆内存
+#    - max_entries_limit_per_query: 5000
+#        单次查询最多返回 5000 行日志
+#    - split_queries_by_interval: 30m
+#        长时间范围查询拆成 30 分钟片段逐段执行，避免一次性加载
+#    - 这三项配合 limits.memory 1Gi 使用，超限时报错而不是 OOMKill
+#
+#  loki.schemaConfig:
+#    - from: 2024-01-01（必须是过去日期，否则启动报错）
+#    - store: tsdb（当前推荐，替代已废弃的 boltdb-shipper）
+#    - object_store: filesystem（与 loki.storage.type 一致）
+#    - schema: v13（Loki 3.x 推荐版本）
+#    - index.period: 24h（每 24 小时一个索引分段）
+#
+#  loki.ingester.wal.flush_on_shutdown: true
+#    - 优雅关闭时把 WAL 刷盘
+#    - 配合 singleBinary.terminationGracePeriodSeconds: 60（默认 30s）
+#    - K8s 发 SIGTERM 后，Loki 有 60s 完成刷盘再退出
+#
+#  singleBinary.persistence:
+#    - enabled: true（默认 false，用 emptyDir）
+#    - size: 20Gi
+#    - storageClassName: local-path（K3s 默认 SC）
+#    - 持久化后 Pod 重建不丢数据
+#    - 30 天保留 + 20Gi 容量，单节点日志量预期 < 5Gi/月
+#
+#  singleBinary.resources:
+#    - requests 256Mi/100m，limits 1Gi/2
+#    - 实测空闲 ~150Mi，峰值 ~400Mi（大量查询时）
+#    - 1Gi 上限覆盖峰值，超出会被 OOMKill
+#
+# ── 2.2 Promtail 关键配置 ───────────────────────────────────
+#
+#  config.clients[0].url
+#    - Loki 的 Service DNS：loki.monitoring.svc.cluster.local:3100
+#    - 格式：<service>.<namespace>.svc.cluster.local:<port>
+#    - Loki 换 namespace 或 Service 名时同步改
+#
+#  resources
+#    - requests 64Mi/50m，limits 128Mi/200m
+#    - 实测空闲 30-60Mi，峰值 ~100Mi（日志量激增时）
+#    - 反复 OOMKill 时升 limits 到 256Mi
+#
+#  config.snippets.scrapeConfigs
+#    - 不覆盖，使用 chart 默认的 K8s SD 配置
+#    - chart 默认已自动发现所有 Pod，附加 4 个低基数标签
+#    - 不需要自定义 relabel_configs
+#
+# ── 2.3 datasource 关键配置 ─────────────────────────────────
+#
+#  ConfigMap 内容见 gitops/manifests/loki-stack/configmap.yaml。
+#  source 3 指向该目录，ConfigMap 带 grafana_datasource: "1" 标签，
+#  被 Grafana sidecar 自动加载。
+#  修改 Loki 地址时改 ConfigMap 的 url，无需改本文件。
+#
+# ────────────────────────────────────────────────────────────
+#  维护约定
+# ────────────────────────────────────────────────────────────
+#
+#  升级 Loki：
+#    改 source 1 的 targetRevision → 对照官方 values diff，
+#    检查是否涉及 2.1 覆盖的字段（尤其 compactor、limits_config）
+#
+#  升级 Promtail：
+#    改 source 2 的 targetRevision → 通常无破坏性变更
+#
+#  迁移 Alloy（Promtail EOL 后）：
+#    替换 source 2 为 Alloy chart，source 1 和 3 不动
+#
+#  换环境（非 K3s）：
+#    Loki 和 Promtail 配置无需改（本文件无 K3s 特定配置）
+#    只有 singleBinary.persistence.storageClassName 可能需要调
+#
+# ============================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki-stack
+  namespace: argocd
+  labels:
+    system: observability
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  sources:
+
+    # ══════════════════════════════════════════════════════
+    #  Source 1 · Loki —— 日志存储与查询
+    # ══════════════════════════════════════════════════════
+    - repoURL: https://grafana-community.github.io/helm-charts
+      chart: loki
+      targetRevision: 20.0.3
+      helm:
+        releaseName: loki
+        values: |
+
+          # ── 2.1 SingleBinary 模式 ─────────────────────────
+          deploymentMode: SingleBinary
+
+          gateway: { enabled: false }
+
+          backend: { replicas: 0 }
+          read:    { replicas: 0 }
+          write:   { replicas: 0 }
+
+          chunksCache:   { enabled: false }
+          resultsCache:  { enabled: false }
+          lokiCanary:    { enabled: false }
+          test:          { enabled: false }
+          monitoring:
+            selfMonitoring:
+              enabled: false
+              grafanaAgent:
+                installOperator: false
+
+          loki:
+            auth_enabled: false
+            commonConfig:
+              replication_factor: 1
+            storage:
+              type: filesystem
+
+            # ── 存储与保留 ────────────────────────────────
+            compactor:
+              working_directory: /var/loki/compactor
+              retention_enabled: true
+              delete_request_store: filesystem
+            limits_config:
+              retention_period: 720h
+
+              # ── 查询限制（内存保护）──────────────────
+              max_query_series: 500
+              max_entries_limit_per_query: 5000
+              split_queries_by_interval: 30m
+
+            # ── schema 与 WAL ─────────────────────────────
+            schemaConfig:
+              configs:
+                - from: "2024-01-01"
+                  store: tsdb
+                  object_store: filesystem
+                  schema: v13
+                  index:
+                    prefix: index_
+                    period: 24h
+
+            ingester:
+              wal:
+                flush_on_shutdown: true
+
+          singleBinary:
+            replicas: 1
+            persistence:
+              enabled: true
+              size: 20Gi
+              storageClassName: local-path
+            resources:
+              requests: { memory: 256Mi, cpu: 100m }
+              limits:   { memory: 1Gi, cpu: "2" }
+            terminationGracePeriodSeconds: 60
+
+    # ══════════════════════════════════════════════════════
+    #  Source 2 · Promtail —— 日志采集 DaemonSet
+    # ══════════════════════════════════════════════════════
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: promtail
+      targetRevision: 6.17.1
+      helm:
+        releaseName: promtail
+        values: |
+
+          # ── 2.2 Loki 推送地址 ─────────────────────────────
+          config:
+            clients:
+              - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+
+          # ── 2.2 资源限制 ──────────────────────────────────
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+
+    # ══════════════════════════════════════════════════════
+    #  Source 3 · Grafana datasource（静态 ConfigMap）
+    #  文件：gitops/manifests/loki-stack/configmap.yaml
+    # ══════════════════════════════════════════════════════
+    - repoURL: https://github.com/qiao-925/arxiv-prod-lab-infra.git
+      targetRevision: main
+      path: gitops/manifests/loki-stack
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+  # Loki StatefulSet 幽灵 diff
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - '.spec.volumeClaimTemplates[].apiVersion'
+        - '.spec.volumeClaimTemplates[].kind'
+        - '.spec.volumeClaimTemplates[].status'

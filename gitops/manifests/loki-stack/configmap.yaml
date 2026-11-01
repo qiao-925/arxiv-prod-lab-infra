@@ -1,0 +1,45 @@
+# ============================================================
+#  loki-datasource —— Grafana 的 Loki 数据源
+# ============================================================
+#
+#  不是服务，是 ConfigMap。被 Grafana sidecar 自动扫描加载。
+#
+#  机制：Grafana Pod 内有一个 grafana-sc-datasources sidecar 容器，
+#       它持续扫描所有 namespace 中带 label "grafana_datasource: 1"
+#       的 ConfigMap，读取 .yaml 键写入 Grafana 的
+#       /etc/grafana/provisioning/datasources/ 目录，
+#       Grafana 主进程检测到新文件后热加载，不需要重启。
+#
+#  效果：本文件 apply 后，几秒到几十秒内 Grafana 里会出现
+#       "Loki" 数据源；删除本文件，sidecar 会清理对应数据源。
+#
+#  关键约束：
+#    - label grafana_datasource: "1"（值必须是字符串 "1"）
+#    - namespace 与 Grafana 相同（monitoring）
+#    - data 键名以 .yaml 结尾（sidecar 只处理 .yaml 文件）
+#    - 内容是 Grafana 标准的 datasource provisioning 格式
+#
+#  修改场景：
+#    - Loki 服务地址变化 → 改 url
+#    - 加其他数据源（如 Tempo）→ 在 datasources 数组里追加，
+#      不用新建 ConfigMap
+#
+# ============================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-datasource
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  loki-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki.monitoring.svc.cluster.local:3100
+        isDefault: false
+        jsonData:
+          maxLines: 5000
